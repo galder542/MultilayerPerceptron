@@ -19,5 +19,6 @@ public class InstantziaOperazioak {
 		BufferedWriter bw = new BufferedWriter(
 				new FileWriter(new File(path.replace(".arff", "_" + ipintzeko + ".arff"))));
 		bw.write(data.toString());
+		bw.close();
 	}
 }
