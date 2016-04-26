@@ -1,5 +1,8 @@
 package ehes.praktika6.preprozesatu;
 
+import weka.attributeSelection.AttributeSelection;
+import weka.attributeSelection.InfoGainAttributeEval;
+import weka.attributeSelection.Ranker;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.InterquartileRange;
@@ -36,5 +39,27 @@ public class Prozesatzailea {
 				new String(String.valueOf(data.numAttributes() - 1) + "," + String.valueOf(data.numAttributes() - 2)));
 		data = Filter.useFilter(data, rm);
 		return data;
+	}
+
+	public Instances infoGainAE(Instances data) throws Exception {
+		AttributeSelection attSelection = new AttributeSelection();
+		InfoGainAttributeEval igae = new InfoGainAttributeEval();
+		Ranker r = new Ranker();
+		data.setClassIndex(data.numAttributes() - 1);
+		r.setNumToSelect(-1);
+		r.setThreshold(0.25);
+		attSelection.setSearch(r);
+		attSelection.setEvaluator(igae);
+		attSelection.SelectAttributes(data);
+		int[] lista = attSelection.selectedAttributes();
+		return this.atributuakKendu(data, lista);
+	}
+
+	private Instances atributuakKendu(Instances data, int[] lista) throws Exception {
+		Remove r = new Remove();
+		r.setAttributeIndicesArray(lista);
+		r.setInvertSelection(true);
+		r.setInputFormat(data);
+		return Filter.useFilter(data, r);
 	}
 }
