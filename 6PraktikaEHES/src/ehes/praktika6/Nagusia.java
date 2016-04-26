@@ -8,7 +8,7 @@ import ehes.praktika6.preprozesatu.Prozesatzailea;
 import weka.core.Instances;
 
 public class Nagusia {
-	private Instances train, test;
+	private Instances train, test, osoa;
 	private String[] argumentuak;
 	private InstantziaOperazioak io;
 	private Prozesatzailea p;
@@ -33,19 +33,23 @@ public class Nagusia {
 
 	private void hasieratu() throws Exception {
 		this.instantziakKargatu();
+		osoa = new Instances(test);
 		this.laburpena(":");
-		this.test.setClassIndex(test.numAttributes() - 1);
-		this.train.setClassIndex(train.numAttributes() - 1);
+		this.klaseaIpini();
 		this.test = p.randomize(test);
 		this.train = p.randomize(train);
 		this.laburpena(" randomize aplikatu eta gero:");
-		this.test = p.normalize(test);
-		this.train = p.normalize(train);
+		osoa = new Instances(test);
+		osoa.addAll(train);
+		this.klaseaIpini();
+		osoa = p.normalize(osoa);
 		this.laburpena(" normalize aplikatu eta gero:");
-		test = p.infoGainAE(test);
-		train = p.infoGainAE(train);
+		osoa = p.infoGainAE(osoa);
 		this.laburpena(" InfoGainAttributeEval aplikatu eta gero:");
-		this.instantziakGorde("proba");
+		this.instantziakBanatu();
+		this.instantziakGorde("filtratuta");
+		this.laburpena(" instantziak banatu eta gero:");
+		this.klaseaIpini();
 		b.baselineEgin(test, train, argumentuak[0]);
 	}
 
@@ -65,8 +69,10 @@ public class Nagusia {
 		System.out.println("Instantzia Kopurua: " + train.numInstances());
 		System.out.println("Test multzoa:");
 		System.out.println("Atributu Kopurua: " + test.numAttributes());
-		System.out.println("Instantzia Kopurua: " + test.numInstances() + "\n");
-
+		System.out.println("Instantzia Kopurua: " + test.numInstances());
+		System.out.println("Multzo Osoa:");
+		System.out.println("Atributu Kopurua: " + osoa.numAttributes());
+		System.out.println("Instantzia Kopurua: " + osoa.numInstances() + "\n");
 	}
 
 	private void instantziakGorde(String ipintzeko) throws IOException {
@@ -76,5 +82,16 @@ public class Nagusia {
 			else
 				io.instantziakGorde(train, argumentuak[i], ipintzeko);
 		}
+	}
+
+	private void klaseaIpini() {
+		test.setClassIndex(test.numAttributes() - 1);
+		train.setClassIndex(train.numAttributes() - 1);
+		osoa.setClassIndex(osoa.numAttributes() - 1);
+	}
+
+	private void instantziakBanatu() {
+		test = new Instances(osoa, 0, test.numInstances() - 1);
+		train = new Instances(osoa, test.numInstances(), test.numInstances() - 1);
 	}
 }

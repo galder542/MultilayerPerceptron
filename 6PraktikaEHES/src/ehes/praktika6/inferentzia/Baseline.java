@@ -9,16 +9,9 @@ public class Baseline {
 		osoa.addAll(train);
 		System.out.println("Naive Bayes aplikatu:");
 		ModeloaEraiki m = new ModeloaEraiki();
-		m.ebaluazioEzZintzoa(osoa, this.naiveBayesBerriaLortu(), path);
-		m.trainVStest(test, train, this.naiveBayesBerriaLortu());
-		m.holdOut7030(osoa, this.naiveBayesBerriaLortu());
-		m.crossValidation(osoa, this.naiveBayesBerriaLortu());
+		m.ebaluazioEzZintzoa(osoa, new NaiveBayes(), path);
+		m.trainVStest(test, train, new NaiveBayes());
+		m.holdOut7030(osoa, new NaiveBayes());
+		m.crossValidation(osoa, new NaiveBayes());
 	}
-
-	private NaiveBayes naiveBayesBerriaLortu() {
-		NaiveBayes nv = new NaiveBayes();
-		nv.setUseKernelEstimator(true);
-		return nv;
-	}
-
 }
