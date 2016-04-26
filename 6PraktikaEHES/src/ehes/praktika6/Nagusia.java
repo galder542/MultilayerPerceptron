@@ -3,7 +3,7 @@ package ehes.praktika6;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import ehes.praktika6.preprozesatu.InstantziaOperazioak;
+import ehes.praktika6.inferentzia.Baseline;
 import ehes.praktika6.preprozesatu.Prozesatzailea;
 import weka.core.Instances;
 
@@ -12,6 +12,7 @@ public class Nagusia {
 	private String[] argumentuak;
 	private InstantziaOperazioak io;
 	private Prozesatzailea p;
+	private Baseline b;
 
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {
@@ -27,6 +28,7 @@ public class Nagusia {
 		this.argumentuak = args;
 		io = new InstantziaOperazioak();
 		p = new Prozesatzailea();
+		b = new Baseline();
 	}
 
 	private void hasieratu() throws Exception {
@@ -44,7 +46,7 @@ public class Nagusia {
 		train = p.infoGainAE(train);
 		this.laburpena(" InfoGainAttributeEval aplikatu eta gero:");
 		this.instantziakGorde("proba");
-
+		b.baselineEgin(test, train, argumentuak[0]);
 	}
 
 	private void instantziakKargatu() throws FileNotFoundException, IOException {

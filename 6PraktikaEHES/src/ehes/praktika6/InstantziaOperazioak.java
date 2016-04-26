@@ -1,4 +1,4 @@
-package ehes.praktika6.preprozesatu;
+package ehes.praktika6;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
