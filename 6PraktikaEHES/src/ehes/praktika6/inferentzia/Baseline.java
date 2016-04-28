@@ -11,7 +11,5 @@ public class Baseline {
 		ModeloaEraiki m = new ModeloaEraiki();
 		m.ebaluazioEzZintzoa(osoa, new NaiveBayes(), path);
 		m.trainVStest(test, train, new NaiveBayes());
-		m.holdOut7030(osoa, new NaiveBayes());
-		m.crossValidation(osoa, new NaiveBayes());
 	}
 }

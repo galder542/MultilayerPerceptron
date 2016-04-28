@@ -3,6 +3,7 @@ package ehes.praktika6;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import ehes.praktika6.inferentzia.ArtificialNeuralNetworks;
 import ehes.praktika6.inferentzia.Baseline;
 import ehes.praktika6.preprozesatu.Prozesatzailea;
 import weka.core.Instances;
@@ -13,6 +14,7 @@ public class Nagusia {
 	private InstantziaOperazioak io;
 	private Prozesatzailea p;
 	private Baseline b;
+	ArtificialNeuralNetworks ann;
 
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {
@@ -29,6 +31,7 @@ public class Nagusia {
 		io = new InstantziaOperazioak();
 		p = new Prozesatzailea();
 		b = new Baseline();
+		ann = new ArtificialNeuralNetworks();
 	}
 
 	private void hasieratu() throws Exception {
@@ -51,6 +54,7 @@ public class Nagusia {
 		this.laburpena(" instantziak banatu eta gero:");
 		this.klaseaIpini();
 		b.baselineEgin(test, train, argumentuak[0]);
+		ann.parametroakEkortu(osoa, test, train, argumentuak[0]);
 	}
 
 	private void instantziakKargatu() throws FileNotFoundException, IOException {
