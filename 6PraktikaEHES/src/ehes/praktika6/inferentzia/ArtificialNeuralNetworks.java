@@ -41,7 +41,7 @@ public class ArtificialNeuralNetworks {
 	private MultilayerPerceptron sailkatzaileaEraiki(String[] aukerak) throws Exception {
 		this.mp = new MultilayerPerceptron();
 		this.mp.setOptions(aukerak);
-		this.mp.setTrainingTime(60);
+		this.mp.setTrainingTime(30);
 		return this.mp;
 	}
 }
