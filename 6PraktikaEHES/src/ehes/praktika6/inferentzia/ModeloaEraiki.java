@@ -8,7 +8,8 @@ import weka.core.Instances;
 public class ModeloaEraiki {
 
 	public void ebaluazioEzZintzoa(Instances data, Classifier sailkatzailea, String path) throws Exception {
-		System.out.println("\nEbaluazio ez zintzoa:");
+		System.out.println(
+				"\n" + sailkatzailea.getClass().getSimpleName() + " sailkatzailearekin ebaluazio ez zintzoa: ");
 		sailkatzailea.buildClassifier(data);
 		Evaluation ebaluatzailea = new Evaluation(data);
 		ebaluatzailea.evaluateModel(sailkatzailea, data);
@@ -25,7 +26,7 @@ public class ModeloaEraiki {
 	}
 
 	public void trainVStest(Instances test, Instances train, Classifier sailkatzailea) throws Exception {
-		System.out.println("\nTrain vs test:");
+		System.out.println("\n" + sailkatzailea.getClass().getSimpleName() + " sailkatzailearekin train vs test:");
 		Evaluation ebaluatzailea = new Evaluation(test);
 		sailkatzailea.buildClassifier(train);
 		ebaluatzailea.evaluateModel(sailkatzailea, test);

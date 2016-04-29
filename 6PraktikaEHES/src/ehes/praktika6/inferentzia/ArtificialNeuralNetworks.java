@@ -14,7 +14,16 @@ public class ArtificialNeuralNetworks {
 		mp = new MultilayerPerceptron();
 	}
 
+	private void annEgin(Instances test, Instances train, Instances osoa, String path, String[] aukeraHoberenak)
+			throws Exception {
+		System.out.println("MultilayerPerceptron aplikatu:");
+		ModeloaEraiki m = new ModeloaEraiki();
+		m.ebaluazioEzZintzoa(osoa, this.sailkatzaileaEraiki(aukeraHoberenak), path);
+		m.trainVStest(test, train, this.sailkatzaileaEraiki(aukeraHoberenak));
+	}
+
 	public void parametroakEkortu(Instances osoa, Instances test, Instances train, String path) throws Exception {
+		System.out.println("\nMultilayerPerceptron sailkatzailearen parametro egokienak bilatzen...");
 		CVParameterSelection cv = new CVParameterSelection();
 		cv.addCVParameter("L 0 1 6");
 		cv.addCVParameter("M 0 1 6");
@@ -28,14 +37,6 @@ public class ArtificialNeuralNetworks {
 		String aukerak = Utils.joinOptions(hoberenak);
 		System.out.println("Parametrorik egokienak: " + aukerak);
 		this.annEgin(test, train, osoa, path, hoberenak);
-	}
-
-	private void annEgin(Instances test, Instances train, Instances osoa, String path, String[] aukeraHoberenak)
-			throws Exception {
-		System.out.println("MultilayerPerceptron aplikatu:");
-		ModeloaEraiki m = new ModeloaEraiki();
-		m.ebaluazioEzZintzoa(osoa, this.sailkatzaileaEraiki(aukeraHoberenak), path);
-		m.trainVStest(test, train, this.sailkatzaileaEraiki(aukeraHoberenak));
 	}
 
 	private MultilayerPerceptron sailkatzaileaEraiki(String[] aukerak) throws Exception {

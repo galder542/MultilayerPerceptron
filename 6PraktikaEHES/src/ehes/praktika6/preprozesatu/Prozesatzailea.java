@@ -12,16 +12,12 @@ import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
 public class Prozesatzailea {
-	public Instances randomize(Instances data) throws Exception {
-		Randomize r = new Randomize();
+	private Instances atributuakKendu(Instances data, int[] lista) throws Exception {
+		Remove r = new Remove();
+		r.setAttributeIndicesArray(lista);
+		r.setInvertSelection(true);
 		r.setInputFormat(data);
 		return Filter.useFilter(data, r);
-	}
-
-	public Instances normalize(Instances data) throws Exception {
-		Normalize n = new Normalize();
-		n.setInputFormat(data);
-		return Filter.useFilter(data, n);
 	}
 
 	public Instances filtroakIpini(Instances data) throws Exception {
@@ -55,10 +51,14 @@ public class Prozesatzailea {
 		return this.atributuakKendu(data, lista);
 	}
 
-	private Instances atributuakKendu(Instances data, int[] lista) throws Exception {
-		Remove r = new Remove();
-		r.setAttributeIndicesArray(lista);
-		r.setInvertSelection(true);
+	public Instances normalize(Instances data) throws Exception {
+		Normalize n = new Normalize();
+		n.setInputFormat(data);
+		return Filter.useFilter(data, n);
+	}
+
+	public Instances randomize(Instances data) throws Exception {
+		Randomize r = new Randomize();
 		r.setInputFormat(data);
 		return Filter.useFilter(data, r);
 	}

@@ -4,9 +4,7 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 
 public class Baseline {
-	public void baselineEgin(Instances test, Instances train, String path) throws Exception {
-		Instances osoa = new Instances(test);
-		osoa.addAll(train);
+	public void baselineEgin(Instances osoa, Instances test, Instances train, String path) throws Exception {
 		System.out.println("Naive Bayes aplikatu:");
 		ModeloaEraiki m = new ModeloaEraiki();
 		m.ebaluazioEzZintzoa(osoa, new NaiveBayes(), path);

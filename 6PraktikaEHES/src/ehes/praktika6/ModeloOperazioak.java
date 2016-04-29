@@ -5,6 +5,10 @@ import weka.core.SerializationHelper;
 
 public class ModeloOperazioak {
 
+	public void modeloaIdatzi(String path, Classifier sailkatzailea) throws Exception {
+		SerializationHelper.write(this.modeloarenPathLortu(path, sailkatzailea), sailkatzailea);
+	}
+
 	private String modeloarenPathLortu(String pathZaharra, Classifier sailkatzailea) {
 		for (int i = pathZaharra.length() - 1; i > 0; --i) {
 			if (pathZaharra.charAt(i) == '/' || pathZaharra.charAt(i) == '\\') {
@@ -12,9 +16,5 @@ public class ModeloOperazioak {
 			}
 		}
 		return new String();
-	}
-
-	public void modeloaIdatzi(String path, Classifier sailkatzailea) throws Exception {
-		SerializationHelper.write(this.modeloarenPathLortu(path, sailkatzailea), sailkatzailea);
 	}
 }
