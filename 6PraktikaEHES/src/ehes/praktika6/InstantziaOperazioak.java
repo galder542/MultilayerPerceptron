@@ -14,7 +14,7 @@ public class InstantziaOperazioak {
 	public void instantziakGorde(Instances data, String path, String ipintzeko) throws IOException {
 		String pathBerria = path.replace(".arff", "_" + ipintzeko + ".arff");
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathBerria)));
-		System.out.println("Instantziak " + path + " karpetara idatziko dira.");
+		System.out.println("Instantziak " + pathBerria + " karpetara idatziko dira.");
 		bw.write(data.toString());
 		bw.close();
 	}

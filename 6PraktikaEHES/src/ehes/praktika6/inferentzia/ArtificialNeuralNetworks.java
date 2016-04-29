@@ -14,15 +14,17 @@ public class ArtificialNeuralNetworks {
 		mp = new MultilayerPerceptron();
 	}
 
-	private void annEgin(Instances test, Instances train, Instances osoa, String path, String[] aukeraHoberenak)
-			throws Exception {
+	private void annEgin(Instances test, Instances train, Instances osoa, String path, String[] aukeraHoberenak,
+			boolean ezZintzoa) throws Exception {
 		System.out.println("MultilayerPerceptron aplikatu:");
 		ModeloaEraiki m = new ModeloaEraiki();
-		m.ebaluazioEzZintzoa(osoa, this.sailkatzaileaEraiki(aukeraHoberenak), path);
+		if (ezZintzoa)
+			m.ebaluazioEzZintzoa(osoa, this.sailkatzaileaEraiki(aukeraHoberenak), path);
 		m.trainVStest(test, train, this.sailkatzaileaEraiki(aukeraHoberenak));
 	}
 
-	public void parametroakEkortu(Instances osoa, Instances test, Instances train, String path) throws Exception {
+	public void parametroakEkortu(Instances osoa, Instances test, Instances train, String path, boolean ezZintzoa)
+			throws Exception {
 		System.out.println("\nMultilayerPerceptron sailkatzailearen parametro egokienak bilatzen...");
 		CVParameterSelection cv = new CVParameterSelection();
 		cv.addCVParameter("L 0 1 6");
@@ -30,13 +32,14 @@ public class ArtificialNeuralNetworks {
 		cv.setSeed(new Random().nextInt(Integer.MAX_VALUE));
 		cv.setNumDecimalPlaces(2);
 		cv.setNumFolds(2);
+		cv.setSeed(new Random().nextInt(100));
 		cv.setClassifier(mp);
 		this.mp.setTrainingTime(1);
 		cv.buildClassifier(osoa);
 		String[] hoberenak = cv.getBestClassifierOptions();
 		String aukerak = Utils.joinOptions(hoberenak);
-		System.out.println("Parametrorik egokienak: " + aukerak);
-		this.annEgin(test, train, osoa, path, hoberenak);
+		System.out.println("Parametro egokienak: " + aukerak);
+		this.annEgin(test, train, osoa, path, hoberenak, ezZintzoa);
 	}
 
 	private MultilayerPerceptron sailkatzaileaEraiki(String[] aukerak) throws Exception {

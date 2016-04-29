@@ -14,7 +14,12 @@ public class Nagusia {
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {
 			System.err.println(
-					"Programak funtzaionatzeko train eta test fitxategien path-ak behar ditu, edozein ordenetan");
+					"Programak funtzaionatzeko train, test fitxategien path-ak eta algoritmo bat behar ditu gutxienez, edozein ordenetan.");
+			System.err.println("Baita ebaluazio ez zintzoa egin dezakezu '-e' parametroa erabiliz.");
+			System.err.println("Modeloa gordetzeko ebaluazio ez zintzoa gaituta egon behar da.");
+			System.err.println("\nErabili daitezkeen algoritmoak: (konbinatu daitezke)");
+			System.err.println(" - '-a': Artificial Neural Network, Multilayer Perceptron");
+			System.err.println(" - '-s': Support Vector Machine");
 			System.exit(1);
 		}
 		Nagusia n = new Nagusia(args);
@@ -26,9 +31,9 @@ public class Nagusia {
 	private InstantziaOperazioak io;
 	private Prozesatzailea p;
 	private Baseline b;
-	ArtificialNeuralNetworks ann;
-
-	StopWatch s;
+	private ArtificialNeuralNetworks ann;
+	private boolean ezZintzoa;
+	private StopWatch s;
 
 	public Nagusia(String[] args) {
 		this.argumentuak = args;
@@ -37,17 +42,28 @@ public class Nagusia {
 		b = new Baseline();
 		ann = new ArtificialNeuralNetworks();
 		s = new StopWatch();
+		ezZintzoa = false;
+	}
+
+	private void ezZintzoa() {
+		for (int i = 0; i < argumentuak.length; i++) {
+			if (argumentuak[i].toLowerCase().contains("-e")) {
+				ezZintzoa = true;
+				System.out.println("Ebaluazio ez zintzoa egingo da eta modeloak gordeko dira.\n");
+				break;
+			}
+		}
+		if (!ezZintzoa)
+			System.out.println("Ebaluazio ez zintzoa desgaituta dago.\n");
 	}
 
 	private void hasieratu() throws Exception {
 		s.start();
+		this.ezZintzoa();
 		this.instantziakKargatu();
 		osoa = new Instances(test);
 		this.laburpena(":");
 		this.klaseaIpini();
-		this.test = p.randomize(test);
-		this.train = p.randomize(train);
-		this.laburpena(" randomize aplikatu eta gero:");
 		osoa = new Instances(test);
 		osoa.addAll(train);
 		this.klaseaIpini();
@@ -56,11 +72,11 @@ public class Nagusia {
 		osoa = p.infoGainAE(osoa);
 		this.laburpena(" InfoGainAttributeEval aplikatu eta gero:");
 		this.instantziakBanatu();
-		this.instantziakGorde("filtratuta");
 		this.laburpena(" instantziak banatu eta gero:");
+		this.instantziakGorde("filtratuta");
 		this.klaseaIpini();
-		b.baselineEgin(osoa, test, train, argumentuak[0]);
-		ann.parametroakEkortu(osoa, test, train, argumentuak[0]);
+		b.baselineEgin(osoa, test, train, argumentuak[0], ezZintzoa);
+		ann.parametroakEkortu(osoa, test, train, argumentuak[0], ezZintzoa);
 		s.stop();
 		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (s.getTime() / 1000) + "s");
 	}
@@ -72,18 +88,18 @@ public class Nagusia {
 
 	private void instantziakGorde(String ipintzeko) throws IOException {
 		for (int i = 0; i < argumentuak.length; i++) {
-			if (argumentuak[i].contains("test"))
+			if (argumentuak[i].toLowerCase().contains("test"))
 				io.instantziakGorde(test, argumentuak[i], ipintzeko);
-			else
+			else if (argumentuak[i].toLowerCase().contains("train"))
 				io.instantziakGorde(train, argumentuak[i], ipintzeko);
 		}
 	}
 
 	private void instantziakKargatu() throws FileNotFoundException, IOException {
 		for (int i = 0; i < argumentuak.length; i++) {
-			if (argumentuak[i].contains("test"))
+			if (argumentuak[i].toLowerCase().contains("test"))
 				this.test = io.instantziakKargatu(argumentuak[i]);
-			else
+			else if (argumentuak[i].toLowerCase().contains("train"))
 				this.train = io.instantziakKargatu(argumentuak[i]);
 		}
 	}

@@ -8,7 +8,6 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.InterquartileRange;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
-import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
 public class Prozesatzailea {
@@ -55,11 +54,5 @@ public class Prozesatzailea {
 		Normalize n = new Normalize();
 		n.setInputFormat(data);
 		return Filter.useFilter(data, n);
-	}
-
-	public Instances randomize(Instances data) throws Exception {
-		Randomize r = new Randomize();
-		r.setInputFormat(data);
-		return Filter.useFilter(data, r);
 	}
 }
