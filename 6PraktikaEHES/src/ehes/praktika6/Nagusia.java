@@ -7,6 +7,7 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import ehes.praktika6.inferentzia.ArtificialNeuralNetworks;
 import ehes.praktika6.inferentzia.Baseline;
+import ehes.praktika6.inferentzia.SupportVectorMachine;
 import ehes.praktika6.preprozesatu.Prozesatzailea;
 import weka.core.Instances;
 
@@ -19,7 +20,8 @@ public class Nagusia {
 			System.err.println("Modeloa gordetzeko ebaluazio ez zintzoa gaituta egon behar da.");
 			System.err.println("\nErabili daitezkeen algoritmoak: (konbinatu daitezke)");
 			System.err.println(" - '-a': Artificial Neural Network, Multilayer Perceptron");
-			System.err.println(" - '-s': Support Vector Machine");
+			System.err.println(" - '-s': Support Vector Machine (OSO MOTELA)");
+			System.err.println(" - '-b': Baseline, NaiveBayes");
 			System.exit(1);
 		}
 		Nagusia n = new Nagusia(args);
@@ -34,6 +36,12 @@ public class Nagusia {
 	private ArtificialNeuralNetworks ann;
 	private boolean ezZintzoa;
 	private StopWatch s;
+	private String testPath, trainPath;
+	private boolean annEgin;
+	private boolean svmEgin;
+	private boolean baselineEgin;
+	private Aukeratzailea ak;
+	private SupportVectorMachine svm;
 
 	public Nagusia(String[] args) {
 		this.argumentuak = args;
@@ -43,23 +51,32 @@ public class Nagusia {
 		ann = new ArtificialNeuralNetworks();
 		s = new StopWatch();
 		ezZintzoa = false;
+		annEgin = false;
+		svmEgin = false;
+		svm = new SupportVectorMachine();
+		baselineEgin = false;
+		ak = new Aukeratzailea();
 	}
 
-	private void ezZintzoa() {
-		for (int i = 0; i < argumentuak.length; i++) {
-			if (argumentuak[i].toLowerCase().contains("-e")) {
-				ezZintzoa = true;
-				System.out.println("Ebaluazio ez zintzoa egingo da eta modeloak gordeko dira.\n");
-				break;
-			}
-		}
-		if (!ezZintzoa)
-			System.out.println("Ebaluazio ez zintzoa desgaituta dago.\n");
+	public void setBaselineEgin(boolean baselineEgin) {
+		this.baselineEgin = baselineEgin;
+	}
+
+	public String[] getArgumentuak() {
+		return argumentuak;
+	}
+
+	public String getTestPath() {
+		return testPath;
+	}
+
+	public String getTrainPath() {
+		return trainPath;
 	}
 
 	private void hasieratu() throws Exception {
 		s.start();
-		this.ezZintzoa();
+		ak.aukeratu(this);
 		this.instantziakKargatu();
 		osoa = new Instances(test);
 		this.laburpena(":");
@@ -75,8 +92,12 @@ public class Nagusia {
 		this.laburpena(" instantziak banatu eta gero:");
 		this.instantziakGorde("filtratuta");
 		this.klaseaIpini();
-		b.baselineEgin(osoa, test, train, argumentuak[0], ezZintzoa);
-		ann.parametroakEkortu(osoa, test, train, argumentuak[0], ezZintzoa);
+		if (baselineEgin)
+			b.baselineEgin(osoa, test, train, trainPath, ezZintzoa);
+		if (annEgin)
+			ann.parametroakEkortu(osoa, test, train, trainPath, ezZintzoa);
+		if (svmEgin)
+			svm.svmEkortu(osoa, train, test, testPath, ezZintzoa);
 		s.stop();
 		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (s.getTime() / 1000) + "s");
 	}
@@ -87,21 +108,17 @@ public class Nagusia {
 	}
 
 	private void instantziakGorde(String ipintzeko) throws IOException {
-		for (int i = 0; i < argumentuak.length; i++) {
-			if (argumentuak[i].toLowerCase().contains("test"))
-				io.instantziakGorde(test, argumentuak[i], ipintzeko);
-			else if (argumentuak[i].toLowerCase().contains("train"))
-				io.instantziakGorde(train, argumentuak[i], ipintzeko);
-		}
+		io.instantziakGorde(test, testPath, ipintzeko);
+		io.instantziakGorde(train, trainPath, ipintzeko);
 	}
 
 	private void instantziakKargatu() throws FileNotFoundException, IOException {
-		for (int i = 0; i < argumentuak.length; i++) {
-			if (argumentuak[i].toLowerCase().contains("test"))
-				this.test = io.instantziakKargatu(argumentuak[i]);
-			else if (argumentuak[i].toLowerCase().contains("train"))
-				this.train = io.instantziakKargatu(argumentuak[i]);
-		}
+		this.test = io.instantziakKargatu(testPath);
+		this.train = io.instantziakKargatu(trainPath);
+	}
+
+	public boolean isEzZintzoa() {
+		return ezZintzoa;
 	}
 
 	private void klaseaIpini() {
@@ -121,5 +138,25 @@ public class Nagusia {
 		System.out.println("Multzo Osoa:");
 		System.out.println("Atributu Kopurua: " + osoa.numAttributes());
 		System.out.println("Instantzia Kopurua: " + osoa.numInstances() + "\n");
+	}
+
+	public void setAnnEgin(boolean annEgin) {
+		this.annEgin = annEgin;
+	}
+
+	public void setEzZintzoa(boolean ezZintzoa) {
+		this.ezZintzoa = ezZintzoa;
+	}
+
+	public void setSvmEgin(boolean svmEgin) {
+		this.svmEgin = svmEgin;
+	}
+
+	public void setTestPath(String testPath) {
+		this.testPath = testPath;
+	}
+
+	public void setTrainPath(String trainPath) {
+		this.trainPath = trainPath;
 	}
 }

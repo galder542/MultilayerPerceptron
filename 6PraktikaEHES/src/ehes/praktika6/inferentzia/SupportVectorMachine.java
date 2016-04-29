@@ -15,7 +15,7 @@ public class SupportVectorMachine {
 		CVParameterSelection cv = new CVParameterSelection();
 		cv.setClassifier(svm);
 		cv.setNumFolds(3);
-		cv.addCVParameter("G 0.01 0.1 5");
+		//cv.addCVParameter("G 0.01 0.1 5");
 		cv.addCVParameter("K 0 3 4");
 		cv.addCVParameter("D 0 5 6");
 		cv.setSeed(new Random().nextInt(100));
@@ -34,6 +34,8 @@ public class SupportVectorMachine {
 		svm.setOptions(hoberenak);
 		if (ezZintzoa)
 			m.ebaluazioEzZintzoa(osoa, svm, path);
+		svm = new LibSVM();
+		svm.setOptions(hoberenak);
 		m.trainVStest(test, train, svm);
 	}
 }
