@@ -16,6 +16,8 @@ public class Nagusia {
 		if (args.length < 2) {
 			System.err.println(
 					"Programak funtzaionatzeko train, test fitxategien path-ak eta algoritmo bat behar ditu gutxienez, edozein ordenetan.");
+			System.err.println("Fitxategiak ematerakoan -test eta -train parametroak erabili behar dira, adibidez:");
+			System.err.println("-test /path/to/test.arff -train /path/to/train.arff");
 			System.err.println("Baita ebaluazio ez zintzoa egin dezakezu '-e' parametroa erabiliz.");
 			System.err.println("Modeloa gordetzeko ebaluazio ez zintzoa gaituta egon behar da.");
 			System.err.println("\nErabili daitezkeen algoritmoak: (konbinatu daitezke)");
