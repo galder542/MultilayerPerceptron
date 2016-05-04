@@ -21,8 +21,9 @@ public class Nagusia {
 			System.err.println("Baita ebaluazio ez zintzoa egin dezakezu '-e' parametroa erabiliz.");
 			System.err.println("Modeloa gordetzeko ebaluazio ez zintzoa gaituta egon behar da.");
 			System.err.println("\nErabili daitezkeen algoritmoak: (konbinatu daitezke)");
-			System.err.println(" - '-a': Artificial Neural Network, Multilayer Perceptron");
-			System.err.println(" - '-s': Support Vector Machine (OSO MOTELA)");
+			System.err.println(
+					" - '-a': Artificial Neural Network, Multilayer Perceptron, honetan '-l' erabilita ebaluazio luzea erabiltzen da (OSO MOTELA).");
+			System.err.println(" - '-s': Support Vector Machine (MOTELA)");
 			System.err.println(" - '-b': Baseline, NaiveBayes");
 			System.exit(1);
 		}
@@ -34,8 +35,6 @@ public class Nagusia {
 	private String[] argumentuak;
 	private InstantziaOperazioak io;
 	private Prozesatzailea p;
-	private Baseline b;
-	private ArtificialNeuralNetworks ann;
 	private boolean ezZintzoa;
 	private StopWatch s;
 	private String testPath, trainPath;
@@ -43,21 +42,23 @@ public class Nagusia {
 	private boolean svmEgin;
 	private boolean baselineEgin;
 	private Aukeratzailea ak;
-	private SupportVectorMachine svm;
+	private boolean luzea;
 
 	public Nagusia(String[] args) {
 		this.argumentuak = args;
 		io = new InstantziaOperazioak();
 		p = new Prozesatzailea();
-		b = new Baseline();
-		ann = new ArtificialNeuralNetworks();
 		s = new StopWatch();
 		ezZintzoa = false;
 		annEgin = false;
 		svmEgin = false;
-		svm = new SupportVectorMachine();
 		baselineEgin = false;
+		luzea = false;
 		ak = new Aukeratzailea();
+	}
+
+	public void setLuzea(boolean luzea) {
+		this.luzea = luzea;
 	}
 
 	public void setBaselineEgin(boolean baselineEgin) {
@@ -94,12 +95,20 @@ public class Nagusia {
 		this.laburpena(" instantziak banatu eta gero:");
 		this.instantziakGorde("filtratuta");
 		this.klaseaIpini();
+		MTRunnable baseline = new MTRunnable(new Baseline(), osoa, test, train, trainPath, ezZintzoa, 0);
+		MTRunnable ann = new MTRunnable(new ArtificialNeuralNetworks(), osoa, test, train, trainPath, ezZintzoa,
+				luzea ? 10 : 2);
+		MTRunnable svm = new MTRunnable(new SupportVectorMachine(), osoa, test, train, trainPath, ezZintzoa, 0);
 		if (baselineEgin)
-			b.baselineEgin(osoa, test, train, trainPath, ezZintzoa);
+			new Thread(baseline).run();
+		// b.baselineEgin(osoa, test, train, trainPath, ezZintzoa);
 		if (annEgin)
-			ann.parametroakEkortu(osoa, test, train, trainPath, ezZintzoa);
+			new Thread(ann).run();
+		// ann.parametroakEkortu(osoa, test, train, trainPath, ezZintzoa, luzea
+		// ? 10 : 2);
 		if (svmEgin)
-			svm.svmEkortu(osoa, train, test, testPath, ezZintzoa);
+			new Thread(svm).run();
+		// svm.svmEkortu(osoa, train, test, testPath, ezZintzoa);
 		s.stop();
 		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (s.getTime() / 1000) + "s");
 	}

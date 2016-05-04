@@ -20,6 +20,9 @@ public class Aukeratzailea {
 			} else if (args[i].toLowerCase().contains("-b")) {
 				nireNagusia.setBaselineEgin(true);
 				System.out.println("NaiveBayes sailkatzailea erabiliko da baselinea egiteko.");
+			} else if (args[i].toLowerCase().contains("-l")) {
+				nireNagusia.setLuzea(true);
+				System.out.println("MultilayerPerceptron sailkatzailearen modu luzea ezarri da.");
 			}
 		}
 		if (nireNagusia.getTestPath() == null || nireNagusia.getTrainPath() == null) {

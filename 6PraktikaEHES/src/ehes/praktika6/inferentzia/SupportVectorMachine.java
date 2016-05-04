@@ -7,8 +7,8 @@ import weka.classifiers.meta.CVParameterSelection;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class SupportVectorMachine {
-	public void svmEkortu(Instances osoa, Instances train, Instances test, String path, boolean ezZintzoa)
+public class SupportVectorMachine implements Sailkatzailea {
+	private void svmEkortu(Instances osoa, Instances train, Instances test, String path, boolean ezZintzoa)
 			throws Exception {
 		System.out.println("\nSupport Vector Machineren parametroak ekortu:");
 		LibSVM svm = new LibSVM();
@@ -36,5 +36,14 @@ public class SupportVectorMachine {
 		svm = new LibSVM();
 		svm.setOptions(hoberenak);
 		m.trainVStest(test, train, svm);
+	}
+
+	public void sailkatzaileaLortu(Instances osoa, Instances test, Instances train, String path, boolean ezZintzoa,
+			int kop) {
+		try {
+			this.svmEkortu(osoa, train, test, path, ezZintzoa);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
