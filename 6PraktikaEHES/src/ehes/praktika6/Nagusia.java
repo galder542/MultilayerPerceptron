@@ -80,7 +80,7 @@ public class Nagusia {
 		this.klaseaEzarri();
 		ann.parametroakEkortu(osoak, test, train, trainPath,3);
 		stopWatch.stop();
-		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (stopWatch.getTime() / 1000) + "s");
+		System.out.println("Programaren exekuzio denbora: " + (stopWatch.getTime() / 1000) + "s");
 	}
 
 	private void instantziakBanatu() {
