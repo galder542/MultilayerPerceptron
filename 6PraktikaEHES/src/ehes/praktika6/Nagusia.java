@@ -72,7 +72,7 @@ public class Nagusia {
 		this.klaseaEzarri();
 		osoak = prozes.normalize(osoak);
 		this.laburpena(" Instantziak normalizatu ondoren:");
-		osoak = prozes.infoGainAE(osoak);
+		osoak = prozes.infoGainAEvalAplikatu(osoak);
 		this.laburpena(" InfoGainAttributeEval aplikatu eta gero:");
 		this.instantziakBanatu();
 		this.laburpena(" Instantzien banaketa egin eta gero:");

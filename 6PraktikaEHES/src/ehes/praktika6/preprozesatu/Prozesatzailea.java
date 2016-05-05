@@ -39,7 +39,7 @@ public class Prozesatzailea {
 		return data;
 	}
 
-	public Instances infoGainAE(Instances data) throws Exception {
+	public Instances infoGainAEvalAplikatu(Instances data) throws Exception {
 		AttributeSelection attSelection = new AttributeSelection();
 		InfoGainAttributeEval igae = new InfoGainAttributeEval();
 		Ranker r = new Ranker();
