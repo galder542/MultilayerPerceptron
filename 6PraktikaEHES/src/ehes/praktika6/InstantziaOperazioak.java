@@ -10,6 +10,9 @@ import java.io.IOException;
 
 import weka.core.Instances;
 
+/*Instantziak gorde eta kargatzeko klasea da hau, gure programak, filtroak aplikatu ondoren, 
+instantzia berriak gordetzen ditu.
+*/
 public class InstantziaOperazioak {
 	public void instantziakGorde(Instances data, String path, String ipintzeko) throws IOException {
 		String pathBerria = path.replace(".arff", "_" + ipintzeko + ".arff");

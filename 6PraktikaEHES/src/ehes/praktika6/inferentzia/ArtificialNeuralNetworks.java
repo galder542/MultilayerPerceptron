@@ -7,24 +7,25 @@ import weka.classifiers.meta.CVParameterSelection;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class ArtificialNeuralNetworks implements Sailkatzailea {
+/*Klase honen helburua, gure Multilayer Perceptron-aren parametro ekorketa burutzea da 
+eta era berean ModeloaEraiki klasea deitu egiten du. Modeloaren inferentzia egiten da.*/
+
+public class ArtificialNeuralNetworks {
 	private MultilayerPerceptron mp;
 
 	public ArtificialNeuralNetworks() {
 		mp = new MultilayerPerceptron();
 	}
 
-	private void annEgin(Instances test, Instances train, Instances osoa, String path, String[] aukeraHoberenak,
-			boolean ezZintzoa, int denbora) throws Exception {
+	private void annEgin(Instances test, Instances train, Instances multzoOsoa, String path,
+			String[] parametroHoberenak) throws Exception {
 		System.out.println("MultilayerPerceptron aplikatu:");
 		ModeloaEraiki m = new ModeloaEraiki();
-		if (ezZintzoa)
-			m.ebaluazioEzZintzoa(osoa, this.sailkatzaileaEraiki(aukeraHoberenak, denbora), path);
-		m.trainVStest(test, train, this.sailkatzaileaEraiki(aukeraHoberenak, denbora));
+		m.trainVStest(test, train, this.sailkatzaileaEraiki(parametroHoberenak, 60));
 	}
 
-	private void parametroakEkortu(Instances osoa, Instances test, Instances train, String path, boolean ezZintzoa,
-			int kop) throws Exception {
+	public void parametroakEkortu(Instances multzoOsoa, Instances test, Instances train, String path, int kop)
+			throws Exception {
 		System.out.println("\nMultilayerPerceptron sailkatzailearen parametro egokienak bilatzen...");
 		CVParameterSelection cv = new CVParameterSelection();
 		cv.addCVParameter("L 0 1 6");
@@ -35,11 +36,11 @@ public class ArtificialNeuralNetworks implements Sailkatzailea {
 		cv.setSeed(new Random().nextInt(100));
 		cv.setClassifier(mp);
 		this.mp.setTrainingTime(kop / 2);
-		cv.buildClassifier(osoa);
-		String[] hoberenak = cv.getBestClassifierOptions();
-		String aukerak = Utils.joinOptions(hoberenak);
+		cv.buildClassifier(multzoOsoa);
+		String[] parametroHoberenak = cv.getBestClassifierOptions();
+		String aukerak = Utils.joinOptions(parametroHoberenak);
 		System.out.println("Parametro egokienak: " + aukerak);
-		this.annEgin(test, train, osoa, path, hoberenak, ezZintzoa, kop * 10);
+		this.annEgin(test, train, multzoOsoa, path, parametroHoberenak);
 	}
 
 	private MultilayerPerceptron sailkatzaileaEraiki(String[] aukerak, int denbora) throws Exception {
@@ -49,10 +50,9 @@ public class ArtificialNeuralNetworks implements Sailkatzailea {
 		return this.mp;
 	}
 
-	public void sailkatzaileaLortu(Instances osoa, Instances test, Instances train, String path, boolean ezZintzoa,
-			int kop) {
+	public void sailkatzaileaLortu(Instances multzoOsoa, Instances test, Instances train, String path, int kop) {
 		try {
-			this.parametroakEkortu(osoa, test, train, path, ezZintzoa, kop);
+			this.parametroakEkortu(multzoOsoa, test, train, path, kop);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -10,6 +10,9 @@ import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
+//Klase hau, instantziei filtroak aplikatzeko erabiltzen da, preprozesamendua: Filtroak + InfoGain Hautaketa:
+
+
 public class Prozesatzailea {
 	private Instances atributuakKendu(Instances data, int[] lista) throws Exception {
 		Remove r = new Remove();

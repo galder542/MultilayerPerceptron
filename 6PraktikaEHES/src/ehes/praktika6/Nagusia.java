@@ -6,65 +6,38 @@ import java.io.IOException;
 import org.apache.commons.lang3.time.StopWatch;
 
 import ehes.praktika6.inferentzia.ArtificialNeuralNetworks;
-import ehes.praktika6.inferentzia.Baseline;
-import ehes.praktika6.inferentzia.SupportVectorMachine;
 import ehes.praktika6.preprozesatu.Prozesatzailea;
 import weka.core.Instances;
 
+/*Programaren klase nagusia da, izenak adierazten duen moduan. Hemendik deitu egiten dira beste klaseak. 
+  Hasteko, train eta test datasetak sartu behar ditugu parametro bidez.
+ */
 public class Nagusia {
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {
-			System.err.println(
-					"Programak funtzaionatzeko train, test fitxategien path-ak eta algoritmo bat behar ditu gutxienez, edozein ordenetan.");
-			System.err.println("Fitxategiak ematerakoan -test eta -train parametroak erabili behar dira, adibidez:");
-			System.err.println("-test /path/to/test.arff -train /path/to/train.arff");
-			System.err.println("Baita ebaluazio ez zintzoa egin dezakezu '-e' parametroa erabiliz.");
-			System.err.println("Modeloa gordetzeko ebaluazio ez zintzoa gaituta egon behar da.");
-			System.err.println("\nErabili daitezkeen algoritmoak: (konbinatu daitezke)");
-			System.err.println(
-					" - '-a': Artificial Neural Network, Multilayer Perceptron, honetan '-l' erabilita ebaluazio luzea erabiltzen da (OSO MOTELA).");
-			System.err.println(" - '-s': Support Vector Machine (MOTELA)");
-			System.err.println(" - '-b': Baseline, NaiveBayes");
+			System.out.println(
+					"Programa funtzionatzeko, test eta train datasetak behar dira, edozein ordenean sarturik!!.");
+			System.out.println("Fitxategiak sartzeko, -test eta -train parametroak jarri behar dira dataseten path-en aurretik. Adibidez:");
+			System.out.println("-test /path/test.arff -train /path/train.arff");
 			System.exit(1);
 		}
 		Nagusia n = new Nagusia(args);
 		n.hasieratu();
 	}
 
-	private Instances train, test, osoa;
+	private Instances train, test, osoak;
 	private String[] argumentuak;
-	private InstantziaOperazioak io;
-	private Prozesatzailea p;
-	private boolean ezZintzoa;
-	private StopWatch s;
+	private InstantziaOperazioak iOperazioak;
+	private Prozesatzailea prozes;
+	private StopWatch stopWatch;
 	private String testPath, trainPath;
-	private boolean annEgin;
-	private boolean svmEgin;
-	private boolean baselineEgin;
-	private Aukeratzailea ak;
-	private boolean luzea;
 
 	public Nagusia(String[] args) {
 		this.argumentuak = args;
-		io = new InstantziaOperazioak();
-		p = new Prozesatzailea();
-		s = new StopWatch();
-		ezZintzoa = false;
-		annEgin = false;
-		svmEgin = false;
-		baselineEgin = false;
-		luzea = false;
-		ak = new Aukeratzailea();
+		iOperazioak = new InstantziaOperazioak();
+		prozes = new Prozesatzailea();
+		stopWatch = new StopWatch();
 	}
-
-	public void setLuzea(boolean luzea) {
-		this.luzea = luzea;
-	}
-
-	public void setBaselineEgin(boolean baselineEgin) {
-		this.baselineEgin = baselineEgin;
-	}
-
 	public String[] getArgumentuak() {
 		return argumentuak;
 	}
@@ -78,64 +51,57 @@ public class Nagusia {
 	}
 
 	private void hasieratu() throws Exception {
-		s.start();
-		ak.aukeratu(this);
+		for (int i = 0; i < argumentuak.length; i++) {
+			if (argumentuak[i].toLowerCase().contains("-test")) {
+				testPath=argumentuak[i+1];
+				
+			}else if (argumentuak[i].toLowerCase().contains("-train")) {
+				trainPath=argumentuak[i+1];
+				
+			}
+			
+		}
+		ArtificialNeuralNetworks ann = new ArtificialNeuralNetworks();
+		stopWatch.start();
 		this.instantziakKargatu();
-		osoa = new Instances(test);
+		osoak = new Instances(test);
 		this.laburpena(":");
-		this.klaseaIpini();
-		osoa = new Instances(test);
-		osoa.addAll(train);
-		this.klaseaIpini();
-		osoa = p.normalize(osoa);
-		this.laburpena(" normalize aplikatu eta gero:");
-		osoa = p.infoGainAE(osoa);
+		this.klaseaEzarri();
+		osoak = new Instances(test);
+		osoak.addAll(train);
+		this.klaseaEzarri();
+		osoak = prozes.normalize(osoak);
+		this.laburpena(" Instantziak normalizatu ondoren:");
+		osoak = prozes.infoGainAE(osoak);
 		this.laburpena(" InfoGainAttributeEval aplikatu eta gero:");
 		this.instantziakBanatu();
-		this.laburpena(" instantziak banatu eta gero:");
+		this.laburpena(" Instantzien banaketa egin eta gero:");
 		this.instantziakGorde("filtratuta");
-		this.klaseaIpini();
-		MTRunnable baseline = new MTRunnable(new Baseline(), osoa, test, train, trainPath, ezZintzoa, 0);
-		MTRunnable ann = new MTRunnable(new ArtificialNeuralNetworks(), osoa, test, train, trainPath, ezZintzoa,
-				luzea ? 10 : 2);
-		MTRunnable svm = new MTRunnable(new SupportVectorMachine(), osoa, test, train, trainPath, ezZintzoa, 0);
-		if (baselineEgin)
-			new Thread(baseline).run();
-		// b.baselineEgin(osoa, test, train, trainPath, ezZintzoa);
-		if (annEgin)
-			new Thread(ann).run();
-		// ann.parametroakEkortu(osoa, test, train, trainPath, ezZintzoa, luzea
-		// ? 10 : 2);
-		if (svmEgin)
-			new Thread(svm).run();
-		// svm.svmEkortu(osoa, train, test, testPath, ezZintzoa);
-		s.stop();
-		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (s.getTime() / 1000) + "s");
+		this.klaseaEzarri();
+		ann.parametroakEkortu(osoak, test, train, trainPath,3);
+		stopWatch.stop();
+		System.out.println("Programak behar izan duen denbora modeloa lortzeko: " + (stopWatch.getTime() / 1000) + "s");
 	}
 
 	private void instantziakBanatu() {
-		test = new Instances(osoa, 0, test.numInstances() - 1);
-		train = new Instances(osoa, test.numInstances(), test.numInstances() - 1);
+		test = new Instances(osoak, 0, test.numInstances() - 1);
+		train = new Instances(osoak, test.numInstances(), test.numInstances() - 1);
 	}
 
 	private void instantziakGorde(String ipintzeko) throws IOException {
-		io.instantziakGorde(test, testPath, ipintzeko);
-		io.instantziakGorde(train, trainPath, ipintzeko);
+		iOperazioak.instantziakGorde(test, testPath, ipintzeko);
+		iOperazioak.instantziakGorde(train, trainPath, ipintzeko);
 	}
 
 	private void instantziakKargatu() throws FileNotFoundException, IOException {
-		this.test = io.instantziakKargatu(testPath);
-		this.train = io.instantziakKargatu(trainPath);
+		this.test = iOperazioak.instantziakKargatu(testPath);
+		this.train = iOperazioak.instantziakKargatu(trainPath);
 	}
 
-	public boolean isEzZintzoa() {
-		return ezZintzoa;
-	}
-
-	private void klaseaIpini() {
+	private void klaseaEzarri() {
 		test.setClassIndex(test.numAttributes() - 1);
 		train.setClassIndex(train.numAttributes() - 1);
-		osoa.setClassIndex(osoa.numAttributes() - 1);
+		osoak.setClassIndex(osoak.numAttributes() - 1);
 	}
 
 	private void laburpena(String mezua) {
@@ -147,20 +113,8 @@ public class Nagusia {
 		System.out.println("Atributu Kopurua: " + test.numAttributes());
 		System.out.println("Instantzia Kopurua: " + test.numInstances());
 		System.out.println("Multzo Osoa:");
-		System.out.println("Atributu Kopurua: " + osoa.numAttributes());
-		System.out.println("Instantzia Kopurua: " + osoa.numInstances() + "\n");
-	}
-
-	public void setAnnEgin(boolean annEgin) {
-		this.annEgin = annEgin;
-	}
-
-	public void setEzZintzoa(boolean ezZintzoa) {
-		this.ezZintzoa = ezZintzoa;
-	}
-
-	public void setSvmEgin(boolean svmEgin) {
-		this.svmEgin = svmEgin;
+		System.out.println("Atributu Kopurua: " + osoak.numAttributes());
+		System.out.println("Instantzia Kopurua: " + osoak.numInstances() + "\n");
 	}
 
 	public void setTestPath(String testPath) {

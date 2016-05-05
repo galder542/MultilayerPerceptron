@@ -1,22 +1,13 @@
 package ehes.praktika6.inferentzia;
 
-import ehes.praktika6.ModeloOperazioak;
+
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 
-public class ModeloaEraiki {
+//Klase honen helburua, modeloak egiten dituen operazioak burutzea da, kasu honetan train vs test egingo dugu:
 
-	public void ebaluazioEzZintzoa(Instances data, Classifier sailkatzailea, String path) throws Exception {
-		System.out.println(
-				"\n" + sailkatzailea.getClass().getSimpleName() + " sailkatzailearekin ebaluazio ez zintzoa: ");
-		sailkatzailea.buildClassifier(data);
-		Evaluation ebaluatzailea = new Evaluation(data);
-		ebaluatzailea.evaluateModel(sailkatzailea, data);
-		this.inprimatuWeka(ebaluatzailea, sailkatzailea);
-		ModeloOperazioak mo = new ModeloOperazioak();
-		mo.modeloaIdatzi(path, sailkatzailea);
-	}
+public class ModeloaEraiki {
 
 	private void inprimatuWeka(Evaluation ebaluatzailea, Classifier sailkatzailea) throws Exception {
 		System.out.println("\n=== Summary ===");
